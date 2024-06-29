@@ -1,72 +1,49 @@
-// Define funtion to get calculated Age
+// Function to calculate age
 function getDOB() {
-  // Getting input from html input element
-  let data = document.getElementById("inputDob").value;
+  // Get input dates
+  let dobString = document.getElementById("inputDob").value;
+  let currentDate = document.getElementById("cdate").value;
 
-  // Convert input data to usable format
-  // as day,month and year
-  let dob = new Date(data);
-  let day = dob.getDate();
-  let month = dob.getMonth();
-  let year = dob.getFullYear();
+  // Convert input dates to Date objects
+  let dob = new Date(dobString);
+  let now = new Date(currentDate);
 
-  // Getting current date and calculating the difference
-  let now = new Date(document.getElementById("cdate").value);
-  console.log(now);
-  let yearDiff = now.getFullYear() - year;
-  let monthDiff = now.getMonth() - month;
-  let dateDiff = now.getDate() - day;
-
-  // Calculating the Age
-  if (yearDiff < 0) console.log("invalid date");
-  else if (monthDiff > 0) {
-    console.log(yearDiff);
-  } else if (monthDiff === 0 && dateDiff >= 0) {
-    console.log(yearDiff);
-  } else {
-    yearDiff = yearDiff - 1;
-    if (monthDiff <= 0)
-      if (dateDiff > 0) monthDiff = 12 + monthDiff;
-      else monthDiff = 11 - monthDiff;
-  }
-  if (dateDiff < 0) {
-    dateDiff = 30 + dateDiff;
-    monthDiff -= 1;
-  }
-
-  // Show calculated age as output
-  // and invalid if wrong input is given
-  if (yearDiff < 0)
+  // Validate input dates
+  if (isNaN(dob.getTime()) || isNaN(now.getTime())) {
     document.getElementById("currentAge").innerHTML = "Invalid Date";
-  else
-    document.getElementById("currentAge").innerHTML =
-      "Your current Age is " +
-      yearDiff +
-      " years " +
-      monthDiff +
-      " months " +
-      dateDiff +
-      " days";
+    return;
+  }
+
+  // Calculate age
+  let yearDiff = now.getFullYear() - dob.getFullYear();
+  let monthDiff = now.getMonth() - dob.getMonth();
+  let dayDiff = now.getDate() - dob.getDate();
+
+  // Adjust for negative month difference or day difference
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    yearDiff--;
+    if (monthDiff < 0) monthDiff += 12;
+  }
+
+  // Display calculated age
+  document.getElementById(
+    "currentAge"
+  ).innerHTML = `Your current age is ${yearDiff} years, ${monthDiff} months, ${dayDiff} days.`;
 }
 
-// Function to provide default date value
+// Function to set current date as default
 function currentDate() {
-  console.log(formatted());
-  let d = document.getElementById("cdate");
-  d.value = formatted();
+  let now = new Date();
+  document.getElementById("cdate").value = formatDate(now);
 }
 
-function formatted(date = new Date()) {
-  return [
-    date.getFullYear(),
-    short(date.getMonth() + 1),
-    short(date.getDate()),
-  ].join("-");
-}
-function short(num) {
-  return num.toString().padStart(2, "0");
+// Function to format date as yyyy-mm-dd
+function formatDate(date) {
+  let year = date.getFullYear();
+  let month = ("0" + (date.getMonth() + 1)).slice(-2); // Adding leading zero if needed
+  let day = ("0" + date.getDate()).slice(-2); // Adding leading zero if needed
+  return `${year}-${month}-${day}`;
 }
 
-// Calling current date function
-// to set default date value
+// Call currentDate() on page load to set default current date
 currentDate();
